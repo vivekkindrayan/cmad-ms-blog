@@ -21,7 +21,7 @@ import io.vertx.ext.web.handler.ErrorHandler;
 public class BlogVerticle extends AbstractVerticle {
 
 	public static final String VERTICLE_NAME = BlogVerticle.class.getName();
-	public static final int HTTP_PORT = 9092;
+	public static final int HTTP_PORT = 7002;
 	
 	@Override
 	public void start(Future<Void> startFuture)

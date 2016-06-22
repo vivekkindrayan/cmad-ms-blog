@@ -26,8 +26,8 @@ public class MySocialUtil {
 	private static ThreadLocal<MongoDatabase> mongoDb = new ThreadLocal<MongoDatabase>();
 	private static ThreadLocal<Datastore> mongoTL = new ThreadLocal<Datastore>();
 	
-	public static final int MONGODB_PORT = 27017;
-	public static final String MONGODB_HOST = "localhost";
+	public static final int MONGODB_PORT = 27018;
+	public static final String MONGODB_HOST = "vm-amitaga-001";
 	
 	public static String MONGODB_URL = MONGODB_URL_PREFIX + MONGODB_HOST + ":" + Integer.toString(MONGODB_PORT);
 	
