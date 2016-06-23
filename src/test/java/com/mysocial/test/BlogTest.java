@@ -46,7 +46,6 @@ public class BlogTest {
 	public final void testMain() {
 		//fail("Not yet implemented"); // TODO
 		System.out.println("testMain");
-
 	}
 
 }
