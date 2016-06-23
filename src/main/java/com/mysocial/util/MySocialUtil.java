@@ -1,13 +1,14 @@
 package com.mysocial.util;
 
+import java.nio.charset.Charset;
 import java.security.MessageDigest;
+import java.util.Base64;
 
 import org.bson.Document;
 import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.Morphia;
 
 import io.vertx.core.AsyncResult;
-import io.vertx.ext.web.Cookie;
 import io.vertx.ext.web.RoutingContext;
 
 import com.mongodb.MongoClient;
@@ -15,6 +16,7 @@ import com.mongodb.MongoClientURI;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.MongoIterable;
+import com.mysocial.beans.Auth;
 import com.mysocial.beans.User;
 import com.mysocial.db.UserPersistence;
 
@@ -76,7 +78,8 @@ public class MySocialUtil {
 		return db.getCollection(dbName);
 	}
 	
-	public static void handleFailure(AsyncResult<Object> resultHandler, @SuppressWarnings("rawtypes") Class clazz) {
+	@SuppressWarnings("rawtypes")
+	public static void handleFailure(AsyncResult<Object> resultHandler, Class clazz) {
 		Throwable t = resultHandler.cause();
 		System.err.println("Failed in " + clazz.getName() + ", result = " + resultHandler.result() + ", message = " + t.getMessage() + ", stacktrace = "); 
 		t.printStackTrace() ;
@@ -108,14 +111,11 @@ public class MySocialUtil {
 	public static User getSignedInUser (RoutingContext routingContext)
 	{
 		String signedInUserId = null;
-		Cookie authCookie = routingContext.getCookie(COOKIE_HEADER);
-		if (authCookie != null) {
-			signedInUserId = authCookie.getValue();
-		}
-
+		String authHeader = routingContext.request().getHeader(AUTH_HEADER);
+		
 		User u = null;
-		if (signedInUserId != null) {
-			u = UserPersistence.getUserById(signedInUserId);
+		if (authHeader != null) {
+			u = getAuthFromHeader(authHeader);
 			if (u != null) {
 				System.out.println("User data for " + signedInUserId + " fetched successfully");
 			} else {
@@ -127,6 +127,24 @@ public class MySocialUtil {
 	
 	protected void finalize() {
 		mongoClient.close();
+	}
+	
+	public static User getAuthFromHeader (String header) {
+		Auth auth = new Auth();
+		if (header != null && !header.isEmpty() && header.startsWith(AUTH_HEADER)) {
+			
+	        String credentials = new String(Base64.getDecoder().decode(header), Charset.forName("UTF-8"));
+	        final String[] values = credentials.split(":",2);
+	        auth.setUserName(values[0]);
+	        auth.setPassword(values[1]);
+		}
+		
+		if (UserPersistence.authenticateUser(auth.getUserName(), auth.getPassword())) {
+			return UserPersistence.getUserByUsername(auth.getUserName());
+		}
+		else {
+			return null;
+		}
 	}
 	
 

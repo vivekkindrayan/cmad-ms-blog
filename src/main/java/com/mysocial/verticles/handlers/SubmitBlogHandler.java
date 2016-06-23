@@ -19,7 +19,6 @@ import io.netty.handler.codec.http.HttpResponseStatus;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpServerResponse;
-import io.vertx.ext.web.Cookie;
 import io.vertx.ext.web.RoutingContext;
 
 public class SubmitBlogHandler implements Handler<RoutingContext> {
@@ -66,19 +65,15 @@ public class SubmitBlogHandler implements Handler<RoutingContext> {
 					Blog savedBlog = (Blog) resultHandler.result();
 					if (savedBlog != null && savedBlog.getUserId() != null) {
 						response.setStatusCode(HttpResponseStatus.OK.code());
-						routingContext.removeCookie(COOKIE_HEADER);
-						routingContext.addCookie(Cookie.cookie(COOKIE_HEADER, b.getUserId().toHexString()));
 						response.end();
 					} else {
 						System.err.println("Failed to retrieve saved blog object OR did not find a signed in user");
 						response.setStatusCode(HttpResponseStatus.BAD_REQUEST.code());
-						routingContext.removeCookie(COOKIE_HEADER);
 						response.end();
 					}
 
 				} else {
 					response.setStatusCode(HttpResponseStatus.BAD_REQUEST.code());
-					routingContext.removeCookie(COOKIE_HEADER);
 					response.end(resultHandler.cause().getMessage());
 					MySocialUtil.handleFailure(resultHandler, this.getClass());
 				}
@@ -88,7 +83,6 @@ public class SubmitBlogHandler implements Handler<RoutingContext> {
 			System.err.println(ex.getMessage());
 			ex.printStackTrace();
 			response.setStatusCode(HttpResponseStatus.BAD_REQUEST.code());
-			routingContext.removeCookie(COOKIE_HEADER);
 			response.end();
 		}
 	}

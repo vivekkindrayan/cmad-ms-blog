@@ -43,6 +43,12 @@ public interface Constants {
 	public static final String REST_URL_SUBMIT_COMMENT = REST_URL_GET_BLOGS + "/:blogId/comments";
 	public static final String QUERY_STRING_TAG = "tag=";
 	
+	public static final String REST_URL_CHAT = "/Services/chat";
+	public static final String EVENT_BUS_ADDRESS = "mysocial_chat_room";
+	public static final String CHAT_MESSAGE_TYPE_LOGIN = "UserLogin";
+	public static final String CHAT_MESSAGE_TYPE_CHAT = "chatMessage";
+	
+	public static final String AUTH_HEADER = "Authorization";
 	
 	public static final String RESPONSE_HEADER_CONTENT_TYPE = "content-type";
 	public static final String RESPONSE_HEADER_JSON = "application/json";
