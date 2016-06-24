@@ -8,6 +8,7 @@ import com.mysocial.verticles.handlers.SubmitCommentHandler;
 
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.AsyncResult;
+import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
@@ -26,6 +27,20 @@ public class BlogVerticle extends AbstractVerticle {
 	@Override
 	public void start(Future<Void> startFuture)
 	{
+		VertxOptions options = new VertxOptions().setWorkerPoolSize(DEFAULT_WORKER_POOL_SIZE);
+		Vertx vertx = Vertx.vertx(options);
+		HttpServer server = vertx.createHttpServer();
+		Router router = Router.router(vertx);
+		
+		router.route().handler(CookieHandler.create());
+		router.route().handler(BodyHandler.create());
+		router.route().failureHandler(ErrorHandler.create());
+		
+		router.post(REST_URL_PREFIX + REST_URL_SUBMIT_BLOG).handler(new SubmitBlogHandler(vertx));
+		router.get(REST_URL_PREFIX + REST_URL_GET_BLOGS).handler(new AllBlogsHandler(vertx));
+		router.post(REST_URL_PREFIX + REST_URL_SUBMIT_COMMENT).handler(new SubmitCommentHandler(vertx));
+		
+		server.requestHandler(router::accept).listen(HTTP_PORT);
 		System.out.println(VERTICLE_NAME + " started");
 		startFuture.complete();
 	}
@@ -54,17 +69,9 @@ public class BlogVerticle extends AbstractVerticle {
 	
 	public static void main(String[] args) throws Exception 
 	{
-		VertxOptions options = new VertxOptions().setWorkerPoolSize(DEFAULT_WORKER_POOL_SIZE);
-		Vertx vertx = Vertx.vertx(options);
-		HttpServer server = vertx.createHttpServer();
-		Router router = Router.router(vertx);
+		//VertxOptions options = new VertxOptions().setWorkerPoolSize(DEFAULT_WORKER_POOL_SIZE);
+		//Vertx vertx = Vertx.vertx(options);
 		
-		router.route().handler(CookieHandler.create());
-		router.route().handler(BodyHandler.create());
-		router.route().failureHandler(ErrorHandler.create());
 		
-		BlogVerticle bv = new BlogVerticle();
-		bv.deploy(vertx, router);
-		server.requestHandler(router::accept).listen(HTTP_PORT);
 	}
 }
