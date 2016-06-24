@@ -57,7 +57,6 @@ public class BlogTest {
 	public final void testMain() {
 		System.out.println("Into -> testMain");
 		assertNotNull(bv);
-		
 	}
 
 }
